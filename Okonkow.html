@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RaceBook - Umuofia Social</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --fb-blue: #1877f2;
+            --fb-blue-hover: #166fe5;
+            --fb-gray: #65676b;
+            --fb-light-gray: #f0f2f5;
+            --fb-border: #dddfe2;
+            --fb-green: #31a24c;
+            --card-bg: #ffffff;
+            --bg-main: #f0f2f5;
+        }
+
+        * {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: var(--bg-main);
+        }
+
+        .fb-shadow {
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .cover-photo {
+            background: linear-gradient(135deg, #1a472a 0%, #2d5a3d 50%, #1a472a 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cover-photo::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .profile-pic-ring {
+            border: 4px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            background-color: #e8d5b5; /* Skin tone base for SVG */
+        }
+
+        .like-btn:hover { background: #f0f2f5; }
+        .like-btn.liked { color: var(--fb-blue); }
+        .like-btn.liked svg { fill: var(--fb-blue); }
+
+        .nav-icon:hover {
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .post-menu:hover { background: var(--fb-light-gray); }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in {
+            animation: slideUp 0.4s ease forwards;
+        }
+
+        .notification-badge {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .create-post-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--fb-blue);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Navigation Bar -->
+    <nav class="bg-[#1877f2] h-14 fixed top-0 left-0 right-0 z-50 flex items-center px-4">
+        <div class="flex items-center gap-3">
+            <!-- Custom "Umuofia" Logo -->
+            <div class="flex items-center gap-2">
+                <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <span class="text-white text-xl font-bold hidden md:block">RaceBook</span>
+            </div>
+            
+            <!-- Search Bar -->
+            <div class="hidden md:flex items-center bg-white/10 rounded-full px-3 py-2 ml-2">
+                <svg class="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input type="text" placeholder="Search RaceBook" class="bg-transparent border-none outline-none text-white placeholder-white/70 ml-2 w-48">
+            </div>
+        </div>
+
+        <!-- Right Icons -->
+        <div class="flex items-center gap-2 ml-auto">
+            <div class="relative nav-icon p-2 cursor-pointer">
+                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 28 28">
+                    <path d="M14 2a12 12 0 1 0 0 24 12 12 0 0 0 0-24m0 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20m1-15h-2v6l5.25 3.15.75-1.23-4-2.42z"/>
+                </svg>
+            </div>
+            <div class="relative nav-icon p-2 cursor-pointer">
+                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 28 28">
+                    <path d="M8 8.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3m6 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3m6 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3M4.5 14a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0m6 0a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0m6 0a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0m6 0a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0M8 22.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3m6 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3m6 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
+                </svg>
+                <span class="notification-badge absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-14">
+        <!-- Profile Header -->
+        <div class="bg-white fb-shadow">
+            <!-- Cover Photo -->
+            <div class="cover-photo h-[200px] md:h-[350px] max-w-[940px] mx-auto relative">
+                <img
+                    src="https://res.cloudinary.com/dqkf0hxfu/image/upload/v1774727778/Igbo_village_at_sunset_a36ncq.png"
+                    alt="Okonkwo cover photo"
+                    class="absolute inset-0 w-full h-full object-cover"
+                />
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="text-center text-white/30">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Picture and Name -->
+            <div class="max-w-[940px] mx-auto px-4 relative">
+                <div class="flex flex-col md:flex-row md:items-end md:justify-between -mt-8 md:-mt-16">
+                    <div class="flex flex-col md:flex-row md:items-end gap-4">
+                        <!-- Profile Picture - Cloud Image -->
+                        <div class="relative w-[168px] h-[168px] flex-shrink-0">
+                            <div class="profile-pic-ring rounded-full overflow-hidden w-full h-full flex items-center justify-center">
+                                <img
+                                    src="https://res.cloudinary.com/dqkf0hxfu/image/upload/v1774726377/Warrior_s_gaze__Okonkwo_s_strength_lwv4u5.png"
+                                    alt="Okonkwo profile picture"
+                                    class="w-full h-full object-cover"
+                                />
+                            </div>
+                            <div class="absolute bottom-3 right-3 bg-[#31a24c] rounded-full w-6 h-6 border-4 border-white"></div>
+                        </div>
+
+                        <!-- Name and Stats -->
+                        <div class="pb-4">
+                            <h1 class="text-3xl font-bold text-gray-900">Okonkwo</h1>
+                            <p class="text-gray-500 text-sm mt-1">4.9K friends</p>
+                            <P class="text-gray-500 text-sm mt-1">3.6M Followers</P>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex gap-2 pb-4 mt-4 md:mt-0">
+                        <button class="bg-[#1877f2] hover:bg-[#166fe5] text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                            Following
+                        </button>
+                        <button class="bg-[#e4e6eb] hover:bg-[#d8dadf] text-gray-900 px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
+                            </svg>
+                            Message
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <div class="flex border-t border-gray-200 mt-4 overflow-x-auto">
+                    <button class="px-4 py-3 text-[#1877f2] border-b-4 border-[#1877f2] font-semibold whitespace-nowrap">Posts</button>
+                    <button class="px-4 py-3 text-gray-500 hover:bg-gray-100 rounded font-semibold whitespace-nowrap">About</button>
+                    <button class="px-4 py-3 text-gray-500 hover:bg-gray-100 rounded font-semibold whitespace-nowrap">Friends</button>
+                    <button class="px-4 py-3 text-gray-500 hover:bg-gray-100 rounded font-semibold whitespace-nowrap">Photos</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="max-w-[940px] mx-auto px-4 py-4 grid grid-cols-1 md:grid-cols-[360px_1fr] gap-4">
+            <!-- Left Column -->
+            <div class="space-y-4">
+                <!-- Bio Section -->
+                <div class="bg-white rounded-lg fb-shadow p-4 animate-in" style="animation-delay: 0.1s;">
+                    <h2 class="font-bold text-lg mb-3">Intro</h2>
+                    <p class="text-gray-700 text-center mb-4">Hey everyone, this is Okonkwo. Without any exaggeration, I want to say that everyone in Umuofia knows me. People know me for my bravery, hard work and determination. I am not afraid of anything but weakness. I think men should work hard and be masculine. I defeated Amalinze the cat, the guy who was undefeated for seven consecutive years, and although I didn’t inherit anything from my father like others, I have barns full of yams. I have three wives and many children. Lastly, from my point of view, the greatest asset of every man is his power.</p>
+                    
+                    <div class="border-t pt-3 space-y-3">
+                        <div class="flex items-center gap-3 text-gray-600">
+                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                            </svg>
+                            <span>Lives in <strong>Umuofia, Igboland</strong></span>
+
+                        </div>
+                        <div class="flex items-center gap-3 text-gray-600">
+                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                            </svg>
+                            <span>Married to <strong>3 wives</strong></span>
+                        </div>
+                        <div class="flex items-center gap-3 text-gray-600">
+                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
+                            </svg>
+                            <span>Wrestling Champion</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-gray-600">
+                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/>
+                            </svg>
+                            <span>Farmer at <strong>Okonkwo Farms</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Posts -->
+            <div class="space-y-4">
+                <!-- Create Post -->
+                <div class="bg-white rounded-lg fb-shadow p-4 animate-in" style="animation-delay: 0.15s;">
+                    <div class="flex gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-700 to-amber-900 flex items-center justify-center flex-shrink-0">
+                            <span class="text-white font-bold">O</span>
+                        </div>
+                        <button id="createPostBtn" class="create-post-input flex-1 bg-[#f0f2f5] rounded-full px-4 py-2 text-left text-gray-500 hover:bg-[#e4e6eb] transition-colors">
+                            What's on your mind, Okonkwo?
+                        </button>
+                    </div>
+                    <div class="border-t mt-3 pt-3 flex justify-around">
+                        <button class="flex items-center gap-2 text-gray-600 hover:bg-gray-100 rounded-lg px-4 py-2 transition-colors">
+                            <svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                            </svg>
+                            <span class="font-medium">Photo</span>
+                        </button>
+                        <button class="flex items-center gap-2 text-gray-600 hover:bg-gray-100 rounded-lg px-4 py-2 transition-colors">
+                            <svg class="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
+                            </svg>
+                            <span class="font-medium">Feeling</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Posts Container -->
+                <div id="postsContainer" class="space-y-4">
+                    <!-- Posts will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Create Post Modal -->
+    <div id="postModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-xl w-full max-w-lg overflow-hidden">
+            <div class="flex items-center justify-between p-4 border-b">
+                <div></div>
+                <h2 class="font-bold text-xl">Create post</h2>
+                <button id="closeModal" class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-4">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-700 to-amber-900 flex items-center justify-center">
+                        <span class="text-white font-bold">O</span>
+                    </div>
+                    <div>
+                        <p class="font-semibold">Okonkwo</p>
+                        <select class="text-xs bg-gray-100 border rounded px-2 py-1">
+                            <option>Public</option>
+                            <option>Friends</option>
+                            <option>Only me</option>
+                        </select>
+                    </div>
+                </div>
+                <textarea id="postContent" class="w-full h-32 resize-none border-none outline-none text-lg" placeholder="What's on your mind, Okonkwo?"></textarea>
+            </div>
+            <div class="p-4">
+                <button id="submitPost" class="w-full bg-[#1877f2] hover:bg-[#166fe5] text-white py-2 rounded-lg font-semibold transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed" disabled>Post</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Posts Data - Updated with your specific posts
+        const postsData = [
+            {
+                id: 1,
+                content: "I would like to thank Mr. Sayed Nasrat Rashid as well for he has spent a lot of time for creating a nice page like this for me. If I were your professor, I would give you  full marks.", 
+                timestamp: "1 hour ago",
+                likes: 313,
+                comments: [
+                    { user: "S. Nasrat", text: "Oh dear Okonkwo, don't mention it.", time: "10h"}
+        
+                ],
+                liked: true
+
+            },
+            {
+                id: 2,
+                content: "I would like to thank Nwakibie for trusting me and giving me 800 yam seeds. Be witness that I am going to make it because I am different.",
+                timestamp: "March 28, 2026",
+                likes: 89,
+                comments: [
+                    { user: "Obierika", text: "You have the strength of a warrior, my friend. The harvest will be great.", time: "2h" }
+                ],
+                liked: false
+            },
+            {
+                id: 3,
+                content: "Remember this day. I defeated Amalinze the Cat in a wrestling match. He was undefeated, but I changed his title. From now on, my name, Okonkwo, will be familiar to all nine villages. A man's power is his greatest asset.",
+                timestamp: "March 28,2024",
+                likes: 542,
+                comments: [
+                    { user: "Nwoye", text: "Father, you make us proud!", time: "20h" },
+                    { user: "Ekwefi", text: "The greatest wrestler in all the land!", time: "18h" },
+                    { user: "S. Nasrat", text: "One of my frieds is really intrested to be your tranee.", time: "20h"}
+                ],
+                liked: true
+            }
+        ];
+
+        // DOM Elements
+        const postsContainer = document.getElementById('postsContainer');
+        const createPostBtn = document.getElementById('createPostBtn');
+        const postModal = document.getElementById('postModal');
+        const closeModal = document.getElementById('closeModal');
+        const postContent = document.getElementById('postContent');
+        const submitPost = document.getElementById('submitPost');
+
+        // Render Posts
+        function renderPosts() {
+            postsContainer.innerHTML = postsData.map((post, index) => `
+                <div class="bg-white rounded-lg fb-shadow animate-in" style="animation-delay: ${0.2 + index * 0.1}s;">
+                    <div class="p-4">
+                        <div class="flex items-start justify-between">
+                            <div class="flex gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-700 to-amber-900 flex items-center justify-center flex-shrink-0">
+                                    <span class="text-white font-bold">O</span>
+                                </div>
+                                <div>
+                                    <p class="font-semibold">Okonkwo</p>
+                                    <p class="text-gray-500 text-xs">${post.timestamp}</p>
+                                </div>
+                            </div>
+                            <button class="post-menu p-2 rounded-full hover:bg-gray-100 transition-colors">
+                                <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                                    <circle cx="12" cy="6" r="2"/>
+                                    <circle cx="12" cy="12" r="2"/>
+                                    <circle cx="12" cy="18" r="2"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <p class="mt-3 text-gray-800 leading-relaxed">${post.content}</p>
+                    </div>
+                    
+                    ${post.likes > 0 || post.comments.length > 0 ? `
+                    <div class="px-4 py-2 flex items-center justify-between text-gray-500 text-sm border-b">
+                        <div class="flex items-center gap-1">
+                            <span class="bg-[#1877f2] rounded-full p-1">
+                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/>
+                                </svg>
+                            </span>
+                            <span>${post.likes}</span>
+                        </div>
+                        ${post.comments.length > 0 ? `<span>${post.comments.length} comment${post.comments.length > 1 ? 's' : ''}</span>` : ''}
+                    </div>
+                    ` : ''}
+                    
+                    <div class="px-4 py-1 flex border-b">
+                        <button onclick="toggleLike(${post.id})" class="like-btn flex-1 flex items-center justify-center gap-2 py-2 rounded-lg transition-colors ${post.liked ? 'liked' : 'text-gray-600'}">
+                            <svg class="w-5 h-5" fill="${post.liked ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
+                            </svg>
+                            <span class="font-medium">Like</span>
+                        </button>
+                        <button onclick="focusComment(${post.id})" class="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                            </svg>
+                            <span class="font-medium">Comment</span>
+                        </button>
+                        <button class="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                            </svg>
+                            <span class="font-medium">Share</span>
+                        </button>
+                    </div>
+                    
+                    ${post.comments.length > 0 ? `
+                    <div class="p-4 space-y-3">
+                        ${post.comments.map(comment => `
+                            <div class="flex gap-2">
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-stone-500 to-stone-700 flex items-center justify-center flex-shrink-0">
+                                    <span class="text-white text-xs font-bold">${comment.user[0]}</span>
+                                </div>
+                                <div class="bg-[#f0f2f5] rounded-2xl px-3 py-2">
+                                    <p class="font-semibold text-sm">${comment.user}</p>
+                                    <p class="text-sm">${comment.text}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    ` : ''}
+                    
+                    <div class="p-4 pt-0">
+                        <div class="flex gap-2">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-700 to-amber-900 flex items-center justify-center flex-shrink-0">
+                                <span class="text-white text-xs font-bold">O</span>
+                            </div>
+                            <div class="flex-1 relative">
+                                <input id="comment-${post.id}" type="text" placeholder="Write a comment..." class="w-full bg-[#f0f2f5] rounded-full px-4 py-2 pr-16 text-sm focus:outline-none focus:ring-2 focus:ring-[#1877f2]">
+                                <button onclick="addComment(${post.id})" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#1877f2]">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Toggle Like
+        function toggleLike(postId) {
+            const post = postsData.find(p => p.id === postId);
+            if (post) {
+                post.liked = !post.liked;
+                post.likes += post.liked ? 1 : -1;
+                renderPosts();
+            }
+        }
+
+        // Focus Comment
+        function focusComment(postId) {
+            const input = document.getElementById(`comment-${postId}`);
+            if (input) input.focus();
+        }
+
+        // Add Comment
+        function addComment(postId) {
+            const input = document.getElementById(`comment-${postId}`);
+            if (input && input.value.trim()) {
+                const post = postsData.find(p => p.id === postId);
+                if (post) {
+                    post.comments.push({
+                        user: 'Okonkwo',
+                        text: input.value.trim(),
+                        time: 'now'
+                    });
+                    input.value = '';
+                    renderPosts();
+                }
+            }
+        }
+
+        // Modal Controls
+        createPostBtn.addEventListener('click', () => {
+            postModal.classList.remove('hidden');
+            postContent.focus();
+        });
+
+        closeModal.addEventListener('click', () => {
+            postModal.classList.add('hidden');
+            postContent.value = '';
+            submitPost.disabled = true;
+        });
+
+        postModal.addEventListener('click', (e) => {
+            if (e.target === postModal) {
+                postModal.classList.add('hidden');
+                postContent.value = '';
+                submitPost.disabled = true;
+            }
+        });
+
+        postContent.addEventListener('input', () => {
+            submitPost.disabled = !postContent.value.trim();
+        });
+
+        submitPost.addEventListener('click', () => {
+            if (postContent.value.trim()) {
+                postsData.unshift({
+                    id: Date.now(),
+                    content: postContent.value.trim(),
+                    timestamp: 'Just now',
+                    likes: 0,
+                    comments: [],
+                    liked: false
+                });
+                postModal.classList.add('hidden');
+                postContent.value = '';
+                submitPost.disabled = true;
+                renderPosts();
+            }
+        });
+
+        // Keyboard accessibility
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !postModal.classList.contains('hidden')) {
+                postModal.classList.add('hidden');
+                postContent.value = '';
+                submitPost.disabled = true;
+            }
+        });
+
+        // Initialize
+        renderPosts();
+    </script>
+</body>
+</html>
